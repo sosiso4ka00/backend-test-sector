@@ -56,7 +56,18 @@ exports.ProfileEdit = async (req, res) => {
 };
 exports.GetProfile = async (req, res) => {
   try {
-    const user = await User.findOne({ where: { id: req.userId } });
+    const user = await User.findOne({
+      where: { id: req.userId },
+      attributes: [
+        "id",
+        "name",
+        "surname",
+        "email",
+        "photo",
+        "gender",
+        "createdAt",
+      ],
+    });
 
     return res.status(200).json(user);
   } catch (error) {
@@ -75,6 +86,15 @@ exports.GetProfiles = async (req, res) => {
       limit: 10,
       offset: (page - 1) * 10,
       order: [["createdAt", "DESC"]],
+      attributes: [
+        "id",
+        "name",
+        "surname",
+        "email",
+        "photo",
+        "gender",
+        "createdAt",
+      ],
     });
 
     res.status(200).json(profiles);
