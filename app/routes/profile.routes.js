@@ -7,7 +7,7 @@ module.exports = function (app) {
     next();
   });
 
-  app.put("/profile/:id",  ProfileController.ProfileEdit);
+  app.put("/profile/:id", [authJwt.verifyToken], ProfileController.ProfileEdit);
 
   app.get("/profile/:id", [authJwt.verifyToken], ProfileController.GetProfile);
 

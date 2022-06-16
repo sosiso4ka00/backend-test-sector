@@ -1,26 +1,27 @@
 const db = require("../models");
 const User = db.user;
 const fs = require("fs");
-const validator = require('validator')
+const validator = require("validator");
 
 exports.ProfileEdit = async (req, res) => {
   try {
     const { surname, gender, email } = req.body;
-    req.userId = 1;
+
     const user = await User.findOne({ where: { id: req.userId } });
-    // if (req.userId != req.params.id)
-    //   return res
-    //     .status(400)
-    //     .json({ error: `You can't edit someone else's account` });
+    if (req.userId != req.params.id)
+      return res
+        .status(400)
+        .json({ error: `You can't edit someone else's account` });
 
     if (
-			req.files &&
+      req.files &&
       req.files.photo &&
       req.files.photo.mimetype != "image/png" &&
       req.files.photo.mimetype != "image/jpg"
     )
       return res.status(400).json({ error: `image not png or jpg` });
 
+    //photo upload
     if (req.files && req.files.photo) {
       try {
         fs.mkdirSync(`public/users/${req.userId}`);
@@ -37,13 +38,15 @@ exports.ProfileEdit = async (req, res) => {
       user.surname = surname;
     }
 
-    if (gender && (gender == 0 || gender == 1)) {
-      user.gender = gender;
+    if (gender) {
+      if (gender == 0 || gender == 1) user.gender = gender;
+      else return res.status(400).json({ error: `wrong gender` });
     }
 
-		if(email && validator.isEmail(email)){
-			user.email = email
-		}
+    if (email) {
+      if (validator.isEmail(email)) user.email = email;
+      else return res.status(400).json({ error: `wrong email` });
+    }
 
     user.save();
     res.status(200).json({ message: `success` });
